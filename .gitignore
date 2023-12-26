@@ -2,6 +2,7 @@ Thumbs.db
 .env
 *pdf
 *.txt
+dist
 node_modules
 # Logs
 logs

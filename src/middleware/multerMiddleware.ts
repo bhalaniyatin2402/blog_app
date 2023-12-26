@@ -1,16 +1,17 @@
-import multer from "multer";
+import { Request } from "express";
+import multer, { FileFilterCallback } from "multer";
 import path from "path";
 
-const upload = multer({
+export const upload = multer({
   dest: "uploads/",
   limits: { fileSize: 3 * 1024 * 1024 },
   storage: multer.diskStorage({
     destination: "uploads/",
-    filename: (_req, file, cb) => {
+    filename: (_req: Request, file: Express.Multer.File, cb) => {
       cb(null, file.originalname);
     },
   }),
-  fileFilter: (_req, file, cb) => {
+  fileFilter: (_req: Request, file: Express.Multer.File, cb) => {
     let ext = path.extname(file.originalname).toLowerCase();
 
     if (
@@ -20,11 +21,9 @@ const upload = multer({
       ext !== "webp" &&
       ext !== ".mp4"
     ) {
-      return cb(new Error(`unsupported file type: ${ext}`), false);
+      return cb(null, false);
     }
 
     cb(null, true);
   },
 });
-
-export { upload };

@@ -1,6 +1,6 @@
 import { Router } from "express";
-const blogRoutes = Router();
-import { upload } from "../middleware/multerMiddleware.js";
+const blogRoutes: Router = Router();
+import { upload } from "../middleware/multerMiddleware";
 
 import {
   allBlogs,
@@ -8,7 +8,7 @@ import {
   addblog,
   updateBlog,
   deleteBlog,
-} from "../controller/blogController.js";
+} from "../controller/blogController";
 
 blogRoutes.get("/", allBlogs);
 blogRoutes.get("/readblog/:id", readBlog);

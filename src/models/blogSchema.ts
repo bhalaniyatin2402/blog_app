@@ -1,6 +1,15 @@
-import { Schema, model } from "mongoose";
+import { Document, Schema, model } from "mongoose";
 
-const blogSchema = new Schema({
+export interface IBlog {
+  title: string,
+  description: string,
+  content: string,
+  poster: string
+}
+
+export interface BlogDocument extends IBlog, Document {}
+
+const blogSchema: Schema = new Schema({
   title: {
     type: String,
     required: [true, "title is require"],
@@ -20,4 +29,6 @@ const blogSchema = new Schema({
   },
 });
 
-export default model("Blog", blogSchema);
+const Blog = model<BlogDocument>("Blog", blogSchema);
+
+export default Blog
