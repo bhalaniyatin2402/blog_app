@@ -1,10 +1,12 @@
-import Blog from "../models/blogSchema.js";
-import AppError from "../utils/errorUtil.js";
-import cloudinary from "cloudinary";
 import fs from "fs";
+import { Request, Response, NextFunction } from "express";
+import cloudinary from "cloudinary";
+
+import Blog, { IBlog, BlogDocument } from "../models/blogSchema";
+import AppError from "../utils/errorUtil";
 
 // to a blog
-const addblog = async (req, res, next) => {
+const addblog = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { title, description, content } = req.body;
 
@@ -12,12 +14,12 @@ const addblog = async (req, res, next) => {
       return next(new AppError("all fields is required filed", 400));
     }
 
-    const blogExist = await Blog.findOne({ title });
+    const blogExist: IBlog | null = await Blog.findOne({ title });
     if (blogExist) {
       return next(new AppError("blog alreasy exist on this title", 400));
     }
 
-    const blog = new Blog({
+    const blog: BlogDocument = new Blog<IBlog>({
       title,
       description,
       content,
@@ -56,7 +58,7 @@ const addblog = async (req, res, next) => {
     await blog.save();
 
     res.status(200).send({
-      success: false,
+      success: true,
       blog,
     });
   } catch (error) {
@@ -65,10 +67,10 @@ const addblog = async (req, res, next) => {
 };
 
 // read a specific blog
-const readBlog = async (req, res) => {
+const readBlog = async (req: Request, res: Response, next: NextFunction) => {
   const blogId = req.params.id;
 
-  const blog = await Blog.findOne({ _id: blogId });
+  const blog: IBlog | null = await Blog.findOne({ _id: blogId });
 
   if (!blog) {
     return next(new AppError("blog is not availble. try after some time", 400));
@@ -81,9 +83,9 @@ const readBlog = async (req, res) => {
 };
 
 // show list of all blogs
-const allBlogs = async (req, res, next) => {
+const allBlogs = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const blogs = await Blog.find();
+    const blogs: Array<IBlog> = await Blog.find();
 
     if (!blogs) {
       return next(new AppError("blogs are not availbale right now", 400));
@@ -99,11 +101,15 @@ const allBlogs = async (req, res, next) => {
 };
 
 // update existing blog
-const updateBlog = async (req, res, next) => {
+const updateBlog = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const blogId = req.params.id;
 
-    const blog = await Blog.findByIdAndUpdate(req.params.id, { ...req.body });
+    const blog: BlogDocument | null = await Blog.findByIdAndUpdate(req.params.id, { ...req.body });
+
+    if (!blog) {
+      return next(new AppError("blog  does not exist on this id", 400));
+    }
 
     if (req.file) {
       try {
@@ -137,11 +143,11 @@ const updateBlog = async (req, res, next) => {
 };
 
 // delete blog
-const deleteBlog = async (req, res, next) => {
+const deleteBlog = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const blogId = req.params.id;
 
-    const blog = await Blog.findOne({ _id: blogId });
+    const blog: IBlog | null = await Blog.findOne({ _id: blogId });
 
     if (!blog) {
       return next(new AppError("blog is not exist", 400));
